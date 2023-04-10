@@ -1,10 +1,10 @@
-﻿using ServiceStack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 namespace KeePassHttpClient
 {
@@ -57,8 +57,9 @@ namespace KeePassHttpClient
                 using (WebClient webClient = new WebClient())
                 {
                     webClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-                    string requestString = request.ToJson();
-                    KeePassHttpResponse response = webClient.UploadString(this.GetKeePassHttpUri(), requestString).FromJson<KeePassHttpResponse>(); ;
+                    string requestString = JsonSerializer.Serialize(request);
+                    string responseString = webClient.UploadString(this.GetKeePassHttpUri(), requestString);
+                    KeePassHttpResponse response = JsonSerializer.Deserialize<KeePassHttpResponse>(responseString);
 
                     if (this.Debug)
                         this.ResponseList.Add(DateTime.Now, response);
